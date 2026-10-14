@@ -1,0 +1,26 @@
+name: 发布工作台更新
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: glc-program-updates
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: github.repository == 'nQrChao/lcgwork' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: 验证数据和更新协议
+        run: node --test freight-exporter/tests/*.test.mjs
+      - name: 构建无业务数据的公开程序
+        run: node freight-exporter/build.mjs --release
+      - name: 发布到更新分支
+        run: node freight-exporter/scripts/publish-update.mjs

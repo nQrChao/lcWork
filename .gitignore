@@ -1,0 +1,27 @@
+# 本地业务资料，不进入公开源码
+/work/
+/outputs/
+/release/
+/lcgwork-public/
+/GLC程序备份/
+*.xlsx
+*.xls
+*.csv
+*.tsv
+*.png
+*.jpg
+*.jpeg
+*.pdf
+*.zip
+*.tar.gz
+*.bak
+*.ndjson
+# 生成的 HTML 由构建产生
+/GLC工作台.html
+/分表工作台.html
+/freight-exporter/dist/index.html
+node_modules/
+.DS_Store
+.env
+.env.*
+test-results/

@@ -1,0 +1,40 @@
+import fs from 'node:fs/promises';
+import vm from 'node:vm';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {createHash} from 'node:crypto';
+import {execFileSync} from 'node:child_process';
+const root=path.dirname(fileURLToPath(import.meta.url)),project=path.resolve(root,'..');
+const output=path.join(project,'outputs/01a13850-358f-7dc2-bed4-6766d8c2ceae');
+const release=process.argv.includes('--release'),withLocalData=process.argv.includes('--with-local-data');
+if(release&&withLocalData)throw new Error('公开发布不能内置本地业务数据。');
+const config=JSON.parse(await fs.readFile(path.join(root,'update-config.json'),'utf8'));
+const pkg=JSON.parse(await fs.readFile(path.join(root,'package.json'),'utf8'));
+if(config.appId!=='glc-workbench'||config.repository!=='nQrChao/lcgwork'||config.sourceBranch!=='main'||config.channel!=='updates'||config.artifact!=='GLC工作台.html')throw new Error('更新源配置不匹配。');
+const seed=withLocalData?await fs.readFile(path.join(output,'2026年运费总表.xlsx')):Buffer.alloc(0);
+const template=await fs.readFile(path.join(root,'index.template.html'),'utf8'),css=await fs.readFile(path.join(root,'dist/styles.css'),'utf8');
+const vendor=await fs.readFile(path.join(root,'dist/vendor/jszip.min.js'),'utf8');
+const scripts=await Promise.all(['core.js','storage.js','excel.js','app.js','workspace.js','media.js','print.js','scan.js','visual-export.js','stamp.js','sync.js','update-core.js','updater.js'].map(f=>fs.readFile(path.join(root,'dist',f),'utf8')));
+const js=scripts.map(s=>s.replace(/^import .*?;\s*$/gm,'').replace(/^export /gm,'')).join('\n');
+new vm.Script(vendor);new vm.Script('(()=>{'+js+'})();');
+const escapeScript=s=>s.replace(/<\/script/gi,'<\\/script');
+const assetNames=['tesseract.min.js','worker.min.js','core.wasm.js','chi_sim.traineddata.gz','eng.traineddata.gz','pdf.min.mjs','pdf.worker.min.mjs','pdf-lib.min.js'];
+const assets=Object.fromEntries(await Promise.all(assetNames.map(async n=>[n,(await fs.readFile(path.join(root,'dist/vendor/ocr',n))).toString('base64')])));
+const licenses=(await Promise.all(['Tesseract-LICENSE','Tesseract-BUNDLE-LICENSE','Worker-BUNDLE-LICENSE','Core-LICENSE','PDFjs-LICENSE','PDFLib-LICENSE'].map(n=>fs.readFile(path.join(root,'dist/vendor/ocr',n),'utf8')))).join('\n');
+const hash=data=>createHash('sha256').update(data).digest('hex');
+const sourceSha=process.env.GITHUB_SHA||'';
+if(release&&!/^[a-f0-9]{40}$/.test(sourceSha))throw new Error('发布构建需要有效的 GITHUB_SHA。');
+const fingerprint=hash([template,css,vendor,js,JSON.stringify(assets),JSON.stringify(config),pkg.version].join('\n'));
+const epoch=process.env.SOURCE_DATE_EPOCH;
+const builtAt=epoch?new Date(Number(epoch)*1000).toISOString():new Date().toISOString();
+const metadata={...config,version:pkg.version,buildId:release?sourceSha:fingerprint,sourceSha:release?sourceSha:null,builtAt,seeded:withLocalData};
+const html=template.replace('<!-- BUILD_METADATA -->',()=>`<script type="application/json" id="glc-build">${JSON.stringify(metadata).replaceAll('<','\\u003c')}</script>`).replace('<!-- APP_STYLES -->',()=>`<style>${css}</style>`).replace('<!-- OCR_ASSETS -->',()=>`<script id="ocr-assets" type="application/json">${JSON.stringify(assets)}</script><script type="text/plain" id="third-party-notices">${escapeScript(licenses)}</script>`).replace('<!-- SEED_WORKBOOK -->',()=>`<script id="seed-workbook" type="application/octet-stream">${seed.toString('base64')}</script>`).replace('<!-- APP_SCRIPTS -->',()=>`<script>${escapeScript(vendor)}</script><script>(()=>{\n'use strict';\n${escapeScript(js)}\n})();</script>`);
+await fs.mkdir(output,{recursive:true});
+for(const target of ['GLC工作台.html','分表工作台.html','freight-exporter/dist/index.html','outputs/01a13850-358f-7dc2-bed4-6766d8c2ceae/GLC工作台.html','outputs/01a13850-358f-7dc2-bed4-6766d8c2ceae/分表工作台.html'])await fs.writeFile(path.join(project,target),html);
+if(release){
+  let notes='更新 GLC工作台';
+  try{notes=execFileSync('git',['show','-s','--format=%B',sourceSha],{cwd:project,encoding:'utf8',stdio:['ignore','pipe','ignore']}).trim().slice(0,12000)||notes;}catch{}
+  const bytes=Buffer.from(html),manifest={schema:1,appId:config.appId,repository:config.repository,sourceBranch:config.sourceBranch,sourceSha,buildId:sourceSha,version:pkg.version,builtAt,notes,file:config.artifact,bytes:bytes.length,sha256:hash(bytes)};
+  const releaseDir=path.join(project,'release');await fs.mkdir(releaseDir,{recursive:true});await fs.writeFile(path.join(releaseDir,config.artifact),bytes);await fs.writeFile(path.join(releaseDir,'update.json'),JSON.stringify(manifest,null,2)+'\n');
+}
+console.log(`Built ${metadata.version} (${metadata.buildId.slice(0,8)}): ${Buffer.byteLength(html)} bytes; embedded business data: ${withLocalData?'YES (local only)':'NO'}`);
