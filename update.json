@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "appId": "glc-workbench",
+  "repository": "nQrChao/lcWork",
+  "sourceBranch": "main",
+  "sourceSha": "344f234f23e4bbc6c422a4c936a16509133657d4",
+  "buildId": "344f234f23e4bbc6c422a4c936a16509133657d4",
+  "version": "1.1.7",
+  "builtAt": "2026-10-15T14:58:11.393Z",
+  "notes": "统一更名为 lcWork，迁移在线更新并保留空白 README",
+  "file": "lcWork.html",
+  "bytes": 15490854,
+  "sha256": "c66553c5ec3333f7840772a69cc8679ef8e9108ac10a242d7b6ddf247873944b"
+}
