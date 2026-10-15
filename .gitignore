@@ -27,3 +27,9 @@ node_modules/
 .env
 .env.*
 test-results/
+
+/lcWork.html
+
+/lcWork程序备份/
+
+/lcWork-public/

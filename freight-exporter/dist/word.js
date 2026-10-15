@@ -62,10 +62,10 @@ async function openWordDocument(file){
   document.body.append(host);await ready;
   try{
     const doc=host.contentDocument,body=doc.querySelector('main');
-    await lib.render(await zip.generateAsync({type:'uint8array'}),body,doc.head,{className:'glc-word',inWrapper:false,ignoreWidth:false,ignoreHeight:false,ignoreFonts:false,breakPages:true,ignoreLastRenderedPageBreak:false,useBase64URL:true,renderHeaders:true,renderFooters:true,renderFootnotes:true,renderEndnotes:true,renderAltChunks:false,renderComments:false,renderChanges:false});
+    await lib.render(await zip.generateAsync({type:'uint8array'}),body,doc.head,{className:'lc-word',inWrapper:false,ignoreWidth:false,ignoreHeight:false,ignoreFonts:false,breakPages:true,ignoreLastRenderedPageBreak:false,useBase64URL:true,renderHeaders:true,renderFooters:true,renderFootnotes:true,renderEndnotes:true,renderAltChunks:false,renderComments:false,renderChanges:false});
     const rules=doc.createElement('style');rules.textContent=`
-      html,body{margin:0;padding:0;background:white} section.glc-word{background:white;flex-shrink:0}
-      section.glc-word>header,section.glc-word>footer{flex-shrink:0}
+      html,body{margin:0;padding:0;background:white} section.lc-word{background:white;flex-shrink:0}
+      section.lc-word>header,section.lc-word>footer{flex-shrink:0}
       .word-page-viewport{flex:1 1 0;min-height:0;overflow:hidden;position:relative}
       .word-page-flow{column-gap:0;column-fill:auto;position:relative;orphans:2;widows:2}
       .word-page-flow article{margin:0!important}.word-page-flow table{max-width:100%}
@@ -80,7 +80,7 @@ async function openWordDocument(file){
     }
     await Promise.all([...doc.images].map(img=>img.decode().catch(()=>{})));await doc.fonts.ready;
     const pages=[];
-    for(const section of body.querySelectorAll('section.glc-word')){
+    for(const section of body.querySelectorAll('section.lc-word')){
       const layout=paginateWordSection(section,host.contentWindow);
       if(pages.length+layout.count>200)throw new Error('Word 超过 200 页，请拆分文件后导入。');
       for(let i=0;i<layout.count;i++)pages.push({...layout,column:i});

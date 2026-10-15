@@ -1,7 +1,7 @@
 {
   "appId": "glc-workbench",
-  "repository": "nQrChao/lcgwork",
+  "repository": "nQrChao/lcWork",
   "sourceBranch": "main",
   "channel": "updates",
-  "artifact": "GLC工作台.html"
+  "artifact": "lcWork.html"
 }

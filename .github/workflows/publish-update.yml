@@ -6,11 +6,11 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: glc-program-updates
+  group: lcwork-program-updates
   cancel-in-progress: false
 jobs:
   publish:
-    if: github.repository == 'nQrChao/lcgwork' && github.ref == 'refs/heads/main'
+    if: github.repository == 'nQrChao/lcWork' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6

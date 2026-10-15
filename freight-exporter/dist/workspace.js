@@ -8,7 +8,7 @@ function showWorkspace(mode){
   $('table-navigation').classList.toggle('hidden',stamp);$('table-storage').classList.toggle('hidden',stamp);$('stamp-navigation').classList.toggle('hidden',!stamp);
   $('table-workspace-open').classList.toggle('active',!stamp);$('stamp-open').classList.toggle('active',stamp);
   $('folder-gate').classList.toggle('hidden',stamp||!!store.directory);
-  document.title=stamp?'印章工作区 · LC工作台':(active?active.name+' · ':'')+'LC工作台';
+  document.title=stamp?'印章工作区 · lcWork':(active?active.name+' · ':'')+'lcWork';
 }
 $('table-workspace-open').onclick=()=>showWorkspace('table');$('stamp-open').onclick=()=>showWorkspace('stamp');
 
@@ -49,7 +49,7 @@ function configureDirectoryPath(copyAfter=false){
   });$('directory-absolute-path').focus();$('directory-absolute-path').select();
 }
 $('copy-file-path').onclick=copyActivePath;$('configure-file-path').onclick=()=>configureDirectoryPath();
-$('locate-file').onclick=async()=>{if(!store.directory)return;try{await window.showDirectoryPicker({id:'glc-locate-folder',startIn:store.directory,mode:'read'});}catch(e){if(e.name!=='AbortError')toast(e.message,true);}};
+$('locate-file').onclick=async()=>{if(!store.directory)return;try{await window.showDirectoryPicker({id:'lc-locate-folder',startIn:store.directory,mode:'read'});}catch(e){if(e.name!=='AbortError')toast(e.message,true);}};
 
 // Hidden table lists belong to directory identity, never just a folder name.
 const removedTableSessions=[];

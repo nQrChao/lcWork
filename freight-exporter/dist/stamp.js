@@ -77,7 +77,7 @@ async function mountStampWorkspace(root){
     if(errors.length)toast((added?`已保存 ${added} 个印章；`:'')+errors.join('；'),true);else if(added)toast(`已保存 ${added} 个印章到本地印章库。`);
   }
   $('seal-upload').onchange=async e=>{const input=e.target;await importSeals([...input.files]);input.value='';};
-  const sealDragType='application/x-glc-seal';
+  const sealDragType='application/x-lc-seal';
   $('seal-library').addEventListener('dragstart',e=>{if(e.target.closest('[data-delete-seal]')){e.preventDefault();return;}const card=e.target.closest('[data-seal-name]');if(!card||sealBusy){e.preventDefault();return;}e.dataTransfer.setData(sealDragType,card.dataset.sealName);e.dataTransfer.effectAllowed='copy';card.classList.add('dragging');});
   $('seal-library').addEventListener('dragend',()=>{$('stamp-stage').classList.remove('drag-over');for(const el of document.querySelectorAll('.seal-card.dragging'))el.classList.remove('dragging');});
   const dropZone=$('seal-drop-zone');
@@ -173,7 +173,7 @@ async function mountStampWorkspace(root){
 async function chooseStampDirectory(){
   if(stampExporting||window.stampBusy)return;
   if(window.stampDraftDirty&&!confirm('更换印章目录会清空尚未导出的盖章位置，继续吗？'))return;
-  try{const options={id:'glc-stamp-library',mode:'readwrite'};if(stampRoot||store.directory)options.startIn=stampRoot||store.directory;const root=await window.showDirectoryPicker(options);await mountStampWorkspace(root);}catch(e){if(e.name!=='AbortError')toast(e.message,true);}
+  try{const options={id:'lc-stamp-library',mode:'readwrite'};if(stampRoot||store.directory)options.startIn=stampRoot||store.directory;const root=await window.showDirectoryPicker(options);await mountStampWorkspace(root);}catch(e){if(e.name!=='AbortError')toast(e.message,true);}
 }
 $('stamp-choose-folder').onclick=chooseStampDirectory;$('stamp-start').onclick=chooseStampDirectory;
 if(!window.showDirectoryPicker){$('stamp-start').disabled=true;$('stamp-choose-folder').disabled=true;}

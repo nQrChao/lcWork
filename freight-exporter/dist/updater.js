@@ -1,4 +1,4 @@
-import {UPDATE_MAX_BYTES,validateUpdateManifest,readBuildMetadata,updateDigest,verifyUpdateArtifact} from './update-core.js';
+import {UPDATE_REPOSITORY,UPDATE_MAX_BYTES,validateUpdateManifest,readBuildMetadata,updateDigest,verifyUpdateArtifact} from './update-core.js';
 const currentBuild=Object.freeze(JSON.parse($('glc-build').textContent));
 const updateUI=$('update-dialog');
 let updateCandidate=null,updateBytes=null,updateDirectory=null,updateController=null,updateRunning=false,updateInstalled=false;
@@ -30,10 +30,10 @@ async function checkProgramUpdate(){
   for(const id of ['update-error','update-install','update-download','update-reload','update-change-dir','update-retry'])updateShow(id,false);
   $('update-hint').textContent='';updateProgress('正在检查更新…');
   try{
-    const api='https://api.github.com/repos/'+currentBuild.repository+'/git/ref/heads/'+encodeURIComponent(currentBuild.channel);
+    const api='https://api.github.com/repos/'+UPDATE_REPOSITORY+'/git/ref/heads/'+encodeURIComponent(currentBuild.channel);
     const head=JSON.parse(new TextDecoder().decode(await fetchUpdateBytes(api,{limit:1024*1024})));
     if(head.object?.type!=='commit'||!/^[a-f0-9]{40}$/.test(head.object?.sha||''))throw new Error('更新分支信息无效。');
-    const base='https://raw.githubusercontent.com/'+currentBuild.repository+'/'+head.object.sha+'/';
+    const base='https://raw.githubusercontent.com/'+UPDATE_REPOSITORY+'/'+head.object.sha+'/';
     const manifest=validateUpdateManifest(JSON.parse(new TextDecoder().decode(await fetchUpdateBytes(base+'update.json'))));
     if(!updateUI.open)return;
     if(manifest.buildId===currentBuild.buildId){$('update-title').textContent='已是最新版本';updateProgress('暂无可用更新。');updateShow('update-retry');return;}
@@ -72,7 +72,7 @@ function programFileName(){let name;try{name=decodeURIComponent(new URL(location
 async function requestProgramDirectory(){
   // Called directly from a click: keep the permission request within user activation.
   if(updateDirectory){const directory=updateDirectory;const p=await directory.requestPermission({mode:'readwrite'});if(p!=='granted')throw new Error('未获得程序目录写入权限，请重新选择程序目录。');return directory;}
-  return window.showDirectoryPicker({id:'glc-program-update',mode:'readwrite'});
+  return window.showDirectoryPicker({id:'lc-program-update',mode:'readwrite'});
 }
 async function installProgramUpdate(){
   if(updateRunning||!updateCandidate)return;updateShow('update-error',false);const problem=updateDraftProblem();if(problem){updateError(problem);return;}
@@ -87,9 +87,9 @@ async function installProgramUpdate(){
     updateDirectory=directory;await rememberUpdateDirectory(directory);updateShow('update-change-dir');
     const bytes=await downloadUpdate();if(!updateUI.open)return;await prepareUpdate();
     updateLock(true,true);updateProgress('正在备份旧版并安装…');
-    const backupDir=await directory.getDirectoryHandle('LC程序备份',{create:true});const backupName=name.replace(/\.html?$/i,'')+'_'+new Date().toISOString().replace(/[:.]/g,'-')+'_'+uid().slice(0,8)+'.html';
+    const backupDir=await directory.getDirectoryHandle('lcWork程序备份',{create:true});const backupName=name.replace(/\.html?$/i,'')+'_'+new Date().toISOString().replace(/[:.]/g,'-')+'_'+uid().slice(0,8)+'.html';
     const backup=await backupDir.getFileHandle(backupName,{create:true});await writeUpdateFile(backup,originalBytes);
-    if(await updateDigest(await (await backup.getFile()).arrayBuffer())!==beforeHash)throw new Error('旧版备份校验失败，已停止安装。');backupPath='LC程序备份 / '+backupName;
+    if(await updateDigest(await (await backup.getFile()).arrayBuffer())!==beforeHash)throw new Error('旧版备份校验失败，已停止安装。');backupPath='lcWork程序备份 / '+backupName;
     if(await updateDigest(await (await handle.getFile()).arrayBuffer())!==beforeHash)throw new Error('程序文件在更新期间被修改，已停止覆盖。请重新打开程序。');
     await writeUpdateFile(handle,bytes);written=true;
     if(await updateDigest(await (await handle.getFile()).arrayBuffer())!==updateCandidate.manifest.sha256)throw new Error('写入后的程序校验未通过。');
@@ -101,5 +101,5 @@ async function installProgramUpdate(){
 $('check-update').onclick=checkProgramUpdate;$('update-retry').onclick=checkProgramUpdate;$('update-close').onclick=closeUpdate;updateUI.addEventListener('cancel',e=>{e.preventDefault();closeUpdate();});
 $('update-change-dir').onclick=()=>{updateDirectory=null;rememberUpdateDirectory(null);updateShow('update-change-dir',false);updateProgress('下次点击「立即更新」时，请选择当前程序所在目录。');};
 $('update-install').onclick=installProgramUpdate;
-$('update-download').onclick=async()=>{if(updateRunning)return;updateShow('update-error',false);updateLock(true);try{const bytes=await downloadUpdate();if(!updateUI.open)return;download(bytes,'LC工作台_'+updateCandidate.manifest.version+'.html','text/html;charset=utf-8');updateProgress('新版已下载。保存当前工作后，用 Chrome / Edge 打开新文件。');}catch(e){if(updateUI.open)updateError(e.message);}finally{updateLock(false);}};
+$('update-download').onclick=async()=>{if(updateRunning)return;updateShow('update-error',false);updateLock(true);try{const bytes=await downloadUpdate();if(!updateUI.open)return;download(bytes,'lcWork_'+updateCandidate.manifest.version+'.html','text/html;charset=utf-8');updateProgress('新版已下载。保存当前工作后，用 Chrome / Edge 打开新文件。');}catch(e){if(updateUI.open)updateError(e.message);}finally{updateLock(false);}};
 $('update-reload').onclick=async()=>{if(!updateInstalled||updateRunning)return;try{await prepareUpdate();location.reload();}catch(e){updateError(e.message);}};
