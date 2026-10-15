@@ -138,7 +138,11 @@ async function mountStampWorkspace(root){
         // Untouched pages retain their original text and content streams.
         pdf.addPage(copies.get(p));
       }else{
-        const pageFrame=await doc.page(p,2600),canvas=pageFrame.canvas,ctx=canvas.getContext('2d');
+        const pageFrame=await doc.page(p,2600),canvas=document.createElement('canvas');
+        canvas.width=pageFrame.canvas.width;canvas.height=pageFrame.canvas.height;
+        // Renderers can leave scale/translation, clipping or alpha on their context.
+        // Copy pixels into a clean canvas so stamp coordinates are always page pixels.
+        const ctx=canvas.getContext('2d');ctx.drawImage(pageFrame.canvas,0,0);
         if(hasSeam){
           const seal=findSeal(seam.name),bitmap=seamBitmap(seal),fullWidth=Math.min(seam.width,canvas.height/canvas.width*bitmap.width/bitmap.height),w=fullWidth/seam.pages.length,h=fullWidth*canvas.width/(bitmap.width/bitmap.height*canvas.height);
           marks.push({pos:{x:seam.edge==='right'?1-w:0,y:Math.max(0,Math.min(1-h,seam.y-h/2)),w,angle:0,blend:seam.blend},seal,part:seamSlice(seal,seam.pages.length,seam.pages.indexOf(p))});
