@@ -14,13 +14,13 @@ if(config.appId!=='glc-workbench'||config.repository!=='nQrChao/lcgwork'||config
 const seed=withLocalData?await fs.readFile(path.join(output,'2026年运费总表.xlsx')):Buffer.alloc(0);
 const template=await fs.readFile(path.join(root,'index.template.html'),'utf8'),css=await fs.readFile(path.join(root,'dist/styles.css'),'utf8');
 const vendor=await fs.readFile(path.join(root,'dist/vendor/jszip.min.js'),'utf8');
-const scripts=await Promise.all(['core.js','storage.js','excel.js','app.js','workspace.js','media.js','print.js','scan.js','visual-export.js','stamp-geometry.js','stamp.js','sync.js','update-core.js','updater.js'].map(f=>fs.readFile(path.join(root,'dist',f),'utf8')));
+const scripts=await Promise.all(['core.js','storage.js','excel.js','app.js','workspace.js','media.js','word.js','print.js','scan.js','visual-export.js','stamp-geometry.js','stamp.js','sync.js','update-core.js','updater.js'].map(f=>fs.readFile(path.join(root,'dist',f),'utf8')));
 const js=scripts.map(s=>s.replace(/^import .*?;\s*$/gm,'').replace(/^export /gm,'')).join('\n');
 new vm.Script(vendor);new vm.Script('(()=>{'+js+'})();');
 const escapeScript=s=>s.replace(/<\/script/gi,'<\\/script');
-const assetNames=['tesseract.min.js','worker.min.js','core.wasm.js','chi_sim.traineddata.gz','eng.traineddata.gz','pdf.min.mjs','pdf.worker.min.mjs','pdf-lib.min.js'];
+const assetNames=['tesseract.min.js','worker.min.js','core.wasm.js','chi_sim.traineddata.gz','eng.traineddata.gz','pdf.min.mjs','pdf.worker.min.mjs','pdf-lib.min.js','docx-preview.min.js','html2canvas.min.js'];
 const assets=Object.fromEntries(await Promise.all(assetNames.map(async n=>[n,(await fs.readFile(path.join(root,'dist/vendor/ocr',n))).toString('base64')])));
-const licenses=(await Promise.all(['Tesseract-LICENSE','Tesseract-BUNDLE-LICENSE','Worker-BUNDLE-LICENSE','Core-LICENSE','PDFjs-LICENSE','PDFLib-LICENSE'].map(n=>fs.readFile(path.join(root,'dist/vendor/ocr',n),'utf8')))).join('\n');
+const licenses=(await Promise.all(['Tesseract-LICENSE','Tesseract-BUNDLE-LICENSE','Worker-BUNDLE-LICENSE','Core-LICENSE','PDFjs-LICENSE','PDFLib-LICENSE','DocxPreview-LICENSE','Html2Canvas-LICENSE'].map(n=>fs.readFile(path.join(root,'dist/vendor/ocr',n),'utf8')))).join('\n');
 const hash=data=>createHash('sha256').update(data).digest('hex');
 const sourceSha=process.env.GITHUB_SHA||'';
 if(release&&!/^[a-f0-9]{40}$/.test(sourceSha))throw new Error('发布构建需要有效的 GITHUB_SHA。');
