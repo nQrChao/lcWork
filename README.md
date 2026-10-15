@@ -10,6 +10,8 @@ Word (.docx) 可在本地导入、分页预览、盖章，并导出 PDF 或多�
 
 选中普通章或骑缝章后，可勾选「正片叠底」，透出底下的文字和线条；预览、PDF 和 PNG 导出均生效。PDF 读取使用离线兼容版组件，避免旧版浏览器因缺少 `toHex` 等方法而打开失败。
 
+PDF 盖章页按预览合成为图像，避免原文件的裁剪、透明状态或批注挡住印章；盖章页的文字不可再选中，未盖章页仍保留原内容和可选文字。
+
 ## 首次上传到仓库
 
 仓库：<https://github.com/nQrChao/lcgwork>，源码分支：`main`。
@@ -66,6 +68,7 @@ npm run test:update
 npm run test:extended
 npm run test:stamp-rotation
 npm run test:word-pdf
+npm run test:pdf-stamp-export
 ```
 
 `dist/update-core.js` 负责更新协议和校验，`dist/updater.js` 负责界面、下载和本地安装，`scripts/publish-update.mjs` 在 GitHub Actions 中发布到更新分支。下载仅访问固定仓库的 GitHub API 与 raw.githubusercontent.com。
