@@ -6,7 +6,7 @@
 
 选中已放置的印章后，可拖动上方手柄旋转，或在左侧设置角度、左右转 90°、一键归正。骑缝章先旋转再分片；PNG 和 PDF 导出保留旋转效果。
 
-Word (.docx) 可在本地导入、分页预览、盖章，并导出 PDF 或多页 PNG ZIP。导出使用独立画布合成，普通章、旋转章和骑缝章不会受 Word 排版缩放影响。旧版 .doc 先用 Word/WPS 另存为 .docx。Word 按本机字体排版，复杂版式请核对预览；需要与原稿完全一致时，先在 Word/WPS 中另存为 PDF。
+Word (.docx) 可在本地导入、分页预览、盖章，并导出 PDF 或多页 PNG ZIP。导出使用独立画布合成，普通章、旋转章和骑缝章不会受 Word 排版缩放影响。浮动表格的左右间距计入可用宽度，表格边框不会被误算成额外页面。旧版 .doc 先用 Word/WPS 另存为 .docx。Word 按本机字体排版，复杂版式请核对预览；需要与原稿完全一致时，先在 Word/WPS 中另存为 PDF。
 
 选中普通章或骑缝章后，可勾选「正片叠底」，透出底下的文字和线条；预览、PDF 和 PNG 导出均生效。PDF 读取使用离线兼容版组件，避免旧版浏览器因缺少 `toHex` 等方法而打开失败。
 
@@ -69,6 +69,7 @@ npm run test:extended
 npm run test:stamp-rotation
 npm run test:word-pdf
 npm run test:pdf-stamp-export
+npm run test:word-pagination
 ```
 
 `dist/update-core.js` 负责更新协议和校验，`dist/updater.js` 负责界面、下载和本地安装，`scripts/publish-update.mjs` 在 GitHub Actions 中发布到更新分支。下载仅访问固定仓库的 GitHub API 与 raw.githubusercontent.com。

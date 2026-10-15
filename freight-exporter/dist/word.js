@@ -28,9 +28,20 @@ function paginateWordSection(section,win){
   viewport.append(flow);
   const bodyWidth=viewport.clientWidth,bodyHeight=viewport.clientHeight;
   if(bodyWidth<80||bodyHeight<80)throw new Error('Word 页边距过大，无法排版，请调整后重新导入。');
-  flow.style.width=bodyWidth+'px';flow.style.height=bodyHeight+'px';flow.style.columnWidth=bodyWidth+'px';
+  flow.style.width=bodyWidth+'px';
+  // Floating Word tables have text-wrapping margins outside their declared width.
+  // max-width:100% alone lets that margin push the right border into the next column.
+  for(const table of flow.querySelectorAll('table')){
+    const style=win.getComputedStyle(table),margin=Math.max(0,parseFloat(style.marginLeft)||0)+Math.max(0,parseFloat(style.marginRight)||0);
+    if(margin)table.style.maxWidth=`calc(100% - ${margin}px)`;
+  }
+  flow.style.height=bodyHeight+'px';flow.style.columnWidth=bodyWidth+'px';
   for(const image of flow.querySelectorAll('img,svg')){image.style.maxWidth='100%';image.style.maxHeight=bodyHeight+'px';image.style.objectFit='contain';}
-  const count=Math.max(1,Math.ceil((flow.scrollWidth-1)/bodyWidth));
+  // scrollWidth includes horizontal paint overflow, not just real page fragments.
+  // A zero-height flow marker locates the last column, including trailing floats.
+  const end=doc.createElement('div');end.style.cssText='clear:both;width:0;height:0;margin:0;padding:0;border:0';flow.append(end);
+  const count=Math.max(1,Math.round((end.getBoundingClientRect().left-flow.getBoundingClientRect().left)/bodyWidth)+1);
+  end.remove();
   return{section,flow,width,height,bodyWidth,count};
 }
 

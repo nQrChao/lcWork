@@ -1,6 +1,6 @@
 {
   "name": "sheet-workbench",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,7 +12,8 @@
     "test:stamp-rotation": "node tests/stamp-rotation-check.mjs",
     "test:stamp": "node tests/stamp-drag-check.mjs",
     "test:word-pdf": "node tests/word-pdf-check.mjs",
-    "test:pdf-stamp-export": "node tests/pdf-stamp-export-check.mjs"
+    "test:pdf-stamp-export": "node tests/pdf-stamp-export-check.mjs",
+    "test:word-pagination": "node tests/word-pagination-check.mjs"
   },
   "devDependencies": {
     "playwright": "^1.62.1",
