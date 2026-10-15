@@ -1,0 +1,6 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {stampAngle,stampGeometry,constrainStamp,resizeStamp} from '../dist/stamp-geometry.js';
+const near=(a,b)=>assert(Math.abs(a-b)<1e-7,`${a} != ${b}`);
+test('rotation keeps the center and rotates non-square corners clockwise',()=>{const g=stampGeometry({x:.2,y:.3,w:.4,angle:90},2,1000,800);near(g.cx,400);near(g.cy,340);near(g.corners[0].x,500);near(g.corners[0].y,140);near(g.corners[2].x,300);near(g.corners[2].y,540);assert.equal(stampAngle(450),90);assert.equal(stampAngle(-450),-90);});
+test('rotated edge placements and oversized tall seals remain completely on the page',()=>{for(const ratio of [.12,.5,1,4])for(const angle of [-179,-90,-35,0,45,90,135]){const p=constrainStamp({x:-.1,y:.88,w:.6,angle},ratio,900,500);const g=stampGeometry(p,ratio,900,500);for(const c of g.corners){assert(c.x>=-1e-7&&c.x<=900+1e-7);assert(c.y>=-1e-7&&c.y<=500+1e-7);}assert.equal(p.angle,angle);}});
+test('rotated resizing follows the handle direction and holds the opposite corner',()=>{const p={x:.35,y:.3,w:.2,angle:45},before=stampGeometry(p,2,1000,800);const resized=resizeStamp(p,2,1000,800,30,90),after=stampGeometry(resized,2,1000,800);assert(after.width>before.width);near(after.corners[0].x,before.corners[0].x);near(after.corners[0].y,before.corners[0].y);assert.equal(resized.angle,45);});

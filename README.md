@@ -4,6 +4,8 @@
 
 公开程序只提供空白运费模板，包含 22 个初始字段；不会内置真实运费记录、单据或印章。已有 Excel 可以自行导入。运行时无需服务器，只有点击「检查更新」才会连接 GitHub。
 
+选中已放置的印章后，可拖动上方手柄旋转，或在左侧设置角度、左右转 90°、一键归正。骑缝章先旋转再分片；PNG 和 PDF 导出保留旋转效果。
+
 ## 首次上传到仓库
 
 仓库：<https://github.com/nQrChao/lcgwork>，源码分支：`main`。
@@ -55,8 +57,10 @@ node freight-exporter/build.mjs
 
 ```sh
 npm install
+npm run build
 npm run test:update
 npm run test:extended
+npm run test:stamp-rotation
 ```
 
 `dist/update-core.js` 负责更新协议和校验，`dist/updater.js` 负责界面、下载和本地安装，`scripts/publish-update.mjs` 在 GitHub Actions 中发布到更新分支。下载仅访问固定仓库的 GitHub API 与 raw.githubusercontent.com。
