@@ -87,9 +87,9 @@ async function installProgramUpdate(){
     updateDirectory=directory;await rememberUpdateDirectory(directory);updateShow('update-change-dir');
     const bytes=await downloadUpdate();if(!updateUI.open)return;await prepareUpdate();
     updateLock(true,true);updateProgress('正在备份旧版并安装…');
-    const backupDir=await directory.getDirectoryHandle('GLC程序备份',{create:true});const backupName=name.replace(/\.html?$/i,'')+'_'+new Date().toISOString().replace(/[:.]/g,'-')+'_'+uid().slice(0,8)+'.html';
+    const backupDir=await directory.getDirectoryHandle('LC程序备份',{create:true});const backupName=name.replace(/\.html?$/i,'')+'_'+new Date().toISOString().replace(/[:.]/g,'-')+'_'+uid().slice(0,8)+'.html';
     const backup=await backupDir.getFileHandle(backupName,{create:true});await writeUpdateFile(backup,originalBytes);
-    if(await updateDigest(await (await backup.getFile()).arrayBuffer())!==beforeHash)throw new Error('旧版备份校验失败，已停止安装。');backupPath='GLC程序备份 / '+backupName;
+    if(await updateDigest(await (await backup.getFile()).arrayBuffer())!==beforeHash)throw new Error('旧版备份校验失败，已停止安装。');backupPath='LC程序备份 / '+backupName;
     if(await updateDigest(await (await handle.getFile()).arrayBuffer())!==beforeHash)throw new Error('程序文件在更新期间被修改，已停止覆盖。请重新打开程序。');
     await writeUpdateFile(handle,bytes);written=true;
     if(await updateDigest(await (await handle.getFile()).arrayBuffer())!==updateCandidate.manifest.sha256)throw new Error('写入后的程序校验未通过。');
@@ -101,5 +101,5 @@ async function installProgramUpdate(){
 $('check-update').onclick=checkProgramUpdate;$('update-retry').onclick=checkProgramUpdate;$('update-close').onclick=closeUpdate;updateUI.addEventListener('cancel',e=>{e.preventDefault();closeUpdate();});
 $('update-change-dir').onclick=()=>{updateDirectory=null;rememberUpdateDirectory(null);updateShow('update-change-dir',false);updateProgress('下次点击「立即更新」时，请选择当前程序所在目录。');};
 $('update-install').onclick=installProgramUpdate;
-$('update-download').onclick=async()=>{if(updateRunning)return;updateShow('update-error',false);updateLock(true);try{const bytes=await downloadUpdate();if(!updateUI.open)return;download(bytes,'GLC工作台_'+updateCandidate.manifest.version+'.html','text/html;charset=utf-8');updateProgress('新版已下载。保存当前工作后，用 Chrome / Edge 打开新文件。');}catch(e){if(updateUI.open)updateError(e.message);}finally{updateLock(false);}};
+$('update-download').onclick=async()=>{if(updateRunning)return;updateShow('update-error',false);updateLock(true);try{const bytes=await downloadUpdate();if(!updateUI.open)return;download(bytes,'LC工作台_'+updateCandidate.manifest.version+'.html','text/html;charset=utf-8');updateProgress('新版已下载。保存当前工作后，用 Chrome / Edge 打开新文件。');}catch(e){if(updateUI.open)updateError(e.message);}finally{updateLock(false);}};
 $('update-reload').onclick=async()=>{if(!updateInstalled||updateRunning)return;try{await prepareUpdate();location.reload();}catch(e){updateError(e.message);}};

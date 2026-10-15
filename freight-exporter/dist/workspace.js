@@ -8,7 +8,7 @@ function showWorkspace(mode){
   $('table-navigation').classList.toggle('hidden',stamp);$('table-storage').classList.toggle('hidden',stamp);$('stamp-navigation').classList.toggle('hidden',!stamp);
   $('table-workspace-open').classList.toggle('active',!stamp);$('stamp-open').classList.toggle('active',stamp);
   $('folder-gate').classList.toggle('hidden',stamp||!!store.directory);
-  document.title=stamp?'印章工作区 · GLC工作台':(active?active.name+' · ':'')+'GLC工作台';
+  document.title=stamp?'印章工作区 · LC工作台':(active?active.name+' · ':'')+'LC工作台';
 }
 $('table-workspace-open').onclick=()=>showWorkspace('table');$('stamp-open').onclick=()=>showWorkspace('stamp');
 

@@ -3,6 +3,7 @@
 /outputs/
 /release/
 /lcgwork-public/
+/LC程序备份/
 /GLC程序备份/
 *.xlsx
 *.xls
@@ -17,6 +18,7 @@
 *.bak
 *.ndjson
 # 生成的 HTML 由构建产生
+/LC工作台.html
 /GLC工作台.html
 /分表工作台.html
 /freight-exporter/dist/index.html

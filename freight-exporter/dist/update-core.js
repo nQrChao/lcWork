@@ -11,7 +11,7 @@ export function validateUpdateManifest(input){
 }
 export function readBuildMetadata(html){
   const match=String(html).match(/<script\b[^>]*\bid=["']glc-build["'][^>]*>([\s\S]*?)<\/script>/i);
-  if(!match||match[1].length>8000)throw new Error('所选文件不是支持更新的 GLC工作台。');
+  if(!match||match[1].length>8000)throw new Error('所选文件不是支持更新的 LC工作台。');
   let value;try{value=JSON.parse(match[1]);}catch{throw new Error('程序版本信息损坏。');}
   if(value.appId!==UPDATE_APP_ID||value.repository!==UPDATE_REPOSITORY||!/^[a-f0-9]{40,64}$/.test(value.buildId||''))throw new Error('程序身份不匹配。');
   return value;
